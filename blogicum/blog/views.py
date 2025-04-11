@@ -12,6 +12,18 @@ from .models import Post, Category, User, Comment
 NUMBER_OF_PAGINATOR_PAGES = 10
 
 
+def get_published_posts(**extra_filters):
+    """Возвращает опубликованные посты с базовыми фильтрами."""
+    base_filters = {
+        'is_published': True,
+        'category__is_published': True,
+        'pub_date__lte': datetime.now(),
+    }
+    # Объединяем базовые фильтры с дополнительными
+    filters = {**base_filters, **extra_filters}
+    return get_posts(**filters)
+
+
 def get_posts(**kwargs):
     """Получение постов"""
     return Post.objects.select_related(
@@ -32,10 +44,7 @@ def get_paginator(request, queryset,
 
 def index(request):
     """Главная страница"""
-    posts = get_posts(
-        is_published=True,
-        category__is_published=True,
-        pub_date__lte=datetime.now())
+    posts = get_published_posts()
     page_obj = get_paginator(request, posts)
     context = {'page_obj': page_obj}
     return render(request, 'blog/index.html', context)
@@ -47,11 +56,7 @@ def category_posts(request, category_slug):
         Category,
         slug=category_slug,
         is_published=True)
-    posts = get_posts(
-        is_published=True,
-        category__is_published=True,
-        pub_date__lte=datetime.now(),
-        category=category)
+    posts = get_published_posts(category=category)
     page_obj = get_paginator(request, posts)
     context = {'category': category,
                'page_obj': page_obj}
@@ -166,11 +171,7 @@ def profile(request, username):
         username=username)
     posts = get_posts(author=profile)
     if request.user != profile:
-        posts = get_posts(
-            is_published=True,
-            category__is_published=True,
-            pub_date__lte=datetime.now(),
-            author=profile)
+        posts = get_published_posts(author=profile)
     page_obj = get_paginator(request, posts)
     context = {'profile': profile,
                'page_obj': page_obj}

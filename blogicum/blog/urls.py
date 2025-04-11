@@ -24,7 +24,7 @@ post_urls = [
 profile_urls = [
     path('edit/',
          views.edit_profile, name='edit_profile'),
-    path('<slug:username>/',
+    path('<str:username>/',
          views.profile, name='profile'),
 ]
 

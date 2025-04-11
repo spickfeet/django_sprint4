@@ -30,6 +30,9 @@ class Category(BaseModel):
                   'латиницы, цифры, дефис и подчёркивание.'
     )
 
+    def __str__(self):
+        return self.title
+
     class Meta:
         verbose_name = 'категория'
         verbose_name_plural = 'Категории'
@@ -38,6 +41,9 @@ class Category(BaseModel):
 class Location(BaseModel):
     name = models.CharField(max_length=TEXT_LENGTH,
                             verbose_name='Название места')
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         verbose_name = 'местоположение'
